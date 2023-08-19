@@ -11,7 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.practice.paging3_splashimage.ui.theme.Paging3splashimageTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,25 +24,17 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+/*
+* access key
+d-b0Xq23J1BmCAVp0dFh5-tTd6cI6B0fgjpPi7nW5P0
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Paging3splashimageTheme {
-        Greeting("Android")
-    }
-}
+* BASE_URL
+https://api.unsplash.com/
+ */

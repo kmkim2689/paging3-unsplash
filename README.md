@@ -1,5 +1,8 @@
 ## Mock Unsplash Application using Paging3
 
+### Reference
+* https://youtu.be/2Tj0LO5L2Dk
+
 ### Intro
 
 * Techs/Things Dealt with This Project
@@ -101,3 +104,143 @@
   6. Remote Keys
     * remote mediator uses to tell the backend service which data to load next
     * related to the remote keys entity
+      * prevPage & nextPage
+
+---
+
+### API Description
+
+* Unsplash Developers
+> https://unsplash.com/documentation
+
+* Procedures
+  1. Register Unsplash Developers
+  2. Register an application -> Demo Mode : 50 requests per hour...
+  3. Your Apps > Keys > get Access Key
+    * Access Key = API Key
+    * for API Request, this should be posted into "header"
+  4. Unsplash API Guidelines
+    * https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines
+    * https://unsplash.com/documentation#public-authentication
+    * Header name : Authorization
+    * Header content : Client-ID YOUR_ACCESS_KEY
+
+* API Request & Response Example
+  * request : https://api.unsplash.com/photos?page=1&per_page=10&order_by=latest
+  * response inspection
+    * 10 different images
+    * each image contains a lot of information
+      * unique id, created_at, updated_at...
+      * what we actually need...
+        * id : id for image
+        * urls => we can access to the actual image(hot links)
+          * raw
+          * full
+          * regular
+          * small
+          * thumb
+        * likes : num of likes
+        * user : user info
+          * id : identification string for user
+          * username
+          * portfolio_url : link
+          * links > html(profile link)
+          * etc...
+
+---
+
+### Project Preparation
+
+1. dependencies
+
+* refer build.gradle(both project and app)
+
+2. properties
+
+* Color.kt
+* drawable
+
+---
+
+### Project Implementation
+
+* Model : model > UnsplashImage.kt(Data Class)
+  * Roles : Defining Data in Each Item Actually used in Whole Data + Database Table
+    => annotate with @Entity and define the tableName 
+  * to use kotlinx-serialization, annotate with @Serializable each data class & @SerialName each field if needed
+  + Urls, User, UserLinks data class
+    * @Embedded (Room) => Room Library가 nested된 클래스안의 필드들을 하나하나 인식하여 그 필드들이 하나의 데이터베이스의 필드의 일원으로 들어가도록 한다.
+      * Marks a field of an Entity or POJO to allow nested fields (i.e. fields of the annotated field's class) to be referenced directly in the SQL queries.
+
+* @SerializedName in Gson vs @SerialName in kotlinx
+  * https://moon-i.tistory.com/entry/Gson-vs-kotlinx-serialization
+
+          For example, if you have 2 classes:
+      
+          data class Coordinates (
+              val latitude: Double,
+              val longitude: Double
+          )
+          
+          data class Address (
+              val street: String,
+              @Embedded
+              val coordinates: Coordinates
+          )
+        
+          Room will consider latitude and longitude as if they are fields of the Address class when mapping an SQLite row to Address.
+          So if you have a query that returns street, latitude, longitude, Room will properly construct an Address class.
+          If the Address class is annotated with Entity, its database table will have 3 columns: street, latitude and longitude.
+
+* data
+  * remote
+    * UnsplashApi.kt(Interface)
+      * for http calls using retrofit
+
+* implementing dagger-hilt in project
+  * MyApplication.kt => Application Class
+    * annotate with @HiltAndroidApp
+    * used by dagger-hilt library to generate "all the necessary codes" we need to actually inject all the dependencies in the project
+  * MainActivity.kt
+    * annotate with @AndroidEntryPoint
+  * di
+    * NetworkModule.kt
+
+* implementing database
+  * entity(table)
+    * UnsplashImage.kt => for item
+    * UnsplashRemoteKeys.kt => for remotemediator
+      * store previous and next page
+      * remote mediator can understand which page to request next
+
+  * ***important : the main role of remote mediator***
+    * handle the pagination from the server "automatically" by manipulating the query parameter dealing with "page"
+    * whenever we request api,
+      * by default the remote mediator can add the "page" query by itself by current page!!
+      * ex) photos?page=1 => "page=1" will be automatically increase as you scroll down -> new data
+  
+  * dao(db queries)
+    * data > local > UnsplashImageDao.kt for actual data of each item
+      * **3 methods needed**
+        * getting "all the items" from "local database"
+          * return type : PagingSource<Key, Value>
+          * Key : Page(Int), Value : Actual Item(UnsplashImage)
+          * by using PagingSource class, we can paginate through room database => not getting all the items from local database at once, instead page by page
+        * add items
+        * delete all the items
+
+    * data > local > UnsplashRemoteKeysDao.kt for Remote Mediator
+      * **3 methods needed**
+        * getRemoteKeys : getting a remote key with specific id
+          * with one specific image id -> get single remote key for that specific image
+        * addAllRemoteKeys
+          * when item added in UnsplashImage table...
+        * deleteAllRemoteKeys
+          * remove all the records
+
+  * database
+    * data > local > UnsplashDatabase.kt
+    * di > DatabaseModule.kt => for injecting
+
+* implementing Remote Mediator for offline caching
+  * purpose of Remote Mediator
