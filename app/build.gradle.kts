@@ -4,11 +4,13 @@ plugins {
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
     id("kotlinx-serialization")
+    kotlin("kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
     namespace = "com.practice.paging3_splashimage"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.practice.paging3_splashimage"
@@ -33,11 +35,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -83,20 +85,34 @@ dependencies {
 
     // Room components
     implementation ("androidx.room:room-runtime:2.5.2")
-    kapt ("androidx.room:room-compiler:2.5.2")
+    // https://velog.io/@jeongminji4490/Error-cannot-find-implementation-for-Impl-does-not-exist
+    kapt("androidx.room:room-compiler:2.5.2")
+
+    // To use Kotlin annotation processing tool (kapt)
     implementation ("androidx.room:room-ktx:2.5.2")
     implementation ("androidx.room:room-paging:2.5.2")
 
     // Paging 3.0
     implementation ("androidx.paging:paging-compose:3.2.0")
+    implementation ("androidx.paging:paging-runtime-ktx:3.2.0")
 
     // Dagger - Hilt
-    implementation ("com.google.dagger:hilt-android:2.47")
-    kapt ("com.google.dagger:hilt-android-compiler:2.45")
+    // hilt 버전 통일(project, app)
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
+//    implementation ("com.google.dagger:hilt-android:2.47")
+//    kapt ("com.google.dagger:hilt-android-compiler:2.45")
     kapt ("androidx.hilt:hilt-compiler:1.0.0")
     implementation ("androidx.hilt:hilt-navigation-compose:1.1.0-alpha01")
+    // 추가하기
+    kapt("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.5.0")
 
     // Coil
     implementation("io.coil-kt:coil-compose:2.4.0")
 
+}
+
+// 추가
+kapt {
+    correctErrorTypes = true
 }

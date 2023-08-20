@@ -244,3 +244,28 @@
 
 * implementing Remote Mediator for offline caching
   * purpose of Remote Mediator
+    1. requesting new data from remote api
+    2. caching the data from remote api into the local database
+
+  * with remote mediator, we don't want to show the data from network directly in app
+  * we want to show the data from 'local database'
+    * local database -> single source of truth
+    * that is... without network connection we can show the data
+
+  * its action starts as the signal from the ui comes
+    * whenever we need more data to load from the database
+    * reach the last item of lazycolumn -> remote mediator "triggers" automatically -> request new page of data from the api -> the new page cached into the local database
+  
+  * to make a remote mediator class
+    * data > paging > UnsplashRemoteMediator.kt
+    * RemoteMediator 클래스의 load 함수는 이러한 데이터 로딩 및 동기화 과정을 수행하는 메서드입니다.
+    * load 함수는 페이지를 로드하고 기존의 로컬 데이터와 원격 데이터 원본을 비교하여 새로운 데이터를 가져오거나 업데이트하는 역할을 합니다. 일반적으로 데이터 원본에서 페이지 단위로 데이터를 가져와 로컬 데이터베이스에 저장하거나 업데이트하게 됩니다.
+    * load 함수는 PagingState와 LoadType 파라미터를 받습니다.
+    * PagingState는 '현재' 페이징 '상태'를 나타내는 객체로, 페이지 수, 페이지 크기, 키 등의 정보를 포함합니다.
+    * LoadType은 데이터 로딩 타입을 나타내는 열거형 값으로, 초기 로딩, 새로 고침, 이전 데이터 추가 로딩, 다음 데이터 추가 로딩 등을 구분할 수 있습니다.
+    * load 함수는 이전에 로드된 데이터와 현재 상태를 기반으로 어떤 데이터를 가져와야 하는지 결정하고, 가져온 데이터를 로컬 데이터베이스에 삽입하거나 업데이트하여 페이징 데이터 소스에 새로운 데이터를 제공합니다. 이 과정은 사용자가 스크롤링하거나 데이터를 새로 고칠 때마다 호출됩니다.
+    * 간단하게 말하면, RemoteMediator 클래스의 load 함수는 원격 데이터 소스에서 데이터를 가져와 로컬 데이터베이스에 저장하거나 업데이트하는 작업을 수행하며, 이로써 Paging3 라이브러리가 페이징된 데이터를 관리하고 유연한 방식으로 데이터를 로딩할 수 있도록 도와줍니다.
+    
+* Implementing a Repository
+  * for ViewModel
+  * 
