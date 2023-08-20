@@ -52,7 +52,7 @@ fun AnimatedShimmer() {
         Color.LightGray.copy(alpha = 0.6f),
         // the lightest color should be in the middle
         Color.LightGray.copy(alpha = 0.2f),
-        Color.LightGray.copy(alpha = 0.6f)
+        Color.LightGray.copy(alpha = 0.35f)
     )
 
     // animate shimmer as long as we want
@@ -77,7 +77,6 @@ fun AnimatedShimmer() {
     )
 
     ShimmerGridItem(brush = brush)
-
 }
 
 @Composable
