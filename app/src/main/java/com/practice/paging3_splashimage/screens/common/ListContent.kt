@@ -34,12 +34,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import com.practice.paging3_splashimage.AnimatedShimmer
 import com.practice.paging3_splashimage.R
 import com.practice.paging3_splashimage.model.UnsplashImage
 import com.practice.paging3_splashimage.model.Urls
@@ -49,30 +51,41 @@ import com.practice.paging3_splashimage.model.UserLinks
 @ExperimentalCoilApi
 @Composable
 fun ListContent(items: LazyPagingItems<UnsplashImage>) {
-    Log.d("Error", items.loadState.toString())
-    LazyVerticalGrid(
-        modifier = Modifier.fillMaxSize(),
-        columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(
-            start = 12.dp,
-            top = 16.dp,
-            end = 12.dp,
-            bottom = 16.dp
-        )
-    ) {
-        items(
-            count = items.itemCount,
-            key = items.itemKey { unsplashImage ->
-                unsplashImage.id
-            },
-            contentType = items.itemContentType { "images" }
-        ) { index: Int ->
-            val unsplashImageItem = items[index]
 
-            if (unsplashImageItem != null) {
-                UnsplashItem(unsplashImage = unsplashImageItem)
+    Box(modifier = Modifier.fillMaxSize()) {
+        Log.d("Error", items.loadState.toString())
+        LazyVerticalGrid(
+            modifier = Modifier.fillMaxSize(),
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(
+                all = 12.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(
+                count = items.itemCount,
+                key = items.itemKey { unsplashImage ->
+                    unsplashImage.id
+                },
+                contentType = items.itemContentType { "images" }
+            ) { index: Int ->
+                val unsplashImageItem = items[index]
+
+                if (unsplashImageItem != null) {
+                    UnsplashItem(unsplashImage = unsplashImageItem)
+                }
+            }
+
+            if (items.loadState.refresh is LoadState.Loading) {
+                items(count = 6) {
+                    AnimatedShimmer()
+                }
             }
         }
+
+
+
 //        items(
 //            items = items,
 //            key = { unsplashImage: UnsplashImage ->
